@@ -11,6 +11,10 @@ public class OutcomeDTO<T> {
     public OutcomeDTO() {
     }
 
+    public OutcomeDTO(String message) {
+        this.message = message;
+    }
+
     public OutcomeDTO(String message, T body, String error) {
         this.message = message;
         this.body = body;

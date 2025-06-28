@@ -6,6 +6,7 @@ import org.davideviscogliosi.devchecklist.dto.ChecklistTemplateDTO;
 import org.davideviscogliosi.devchecklist.dto.OutcomeDTO;
 import org.davideviscogliosi.devchecklist.model.ChecklistTemplate;
 import org.davideviscogliosi.devchecklist.service.ChecklistTemplateService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,6 +24,10 @@ public class ChecklistTemplateController {
 
     @PostMapping
     public ResponseEntity<OutcomeDTO<ChecklistTemplateDTO>> createTemplate(@RequestBody ChecklistTemplateDTO template) {
+
+        if(template.getName() == null || template.getName().isBlank()){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new OutcomeDTO<>("Template Name is mandatory"));
+        }
 
         return checklistTemplateHandler.createTemplate(template);
     }
