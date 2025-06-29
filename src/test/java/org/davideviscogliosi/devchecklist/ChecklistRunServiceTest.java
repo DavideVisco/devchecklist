@@ -4,11 +4,9 @@ package org.davideviscogliosi.devchecklist;
 import org.davideviscogliosi.devchecklist.dto.ChecklistItemRunDTO;
 import org.davideviscogliosi.devchecklist.dto.ChecklistRunDTO;
 import org.davideviscogliosi.devchecklist.exception.ChecklistException;
-import org.davideviscogliosi.devchecklist.model.ChecklistItemRun;
-import org.davideviscogliosi.devchecklist.model.ChecklistItemTemplate;
-import org.davideviscogliosi.devchecklist.model.ChecklistRun;
-import org.davideviscogliosi.devchecklist.model.ChecklistTemplate;
+import org.davideviscogliosi.devchecklist.model.*;
 import org.davideviscogliosi.devchecklist.repository.ChecklistTemplateRepository;
+import org.davideviscogliosi.devchecklist.repository.UserRepository;
 import org.davideviscogliosi.devchecklist.service.ChecklistRunService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,9 +27,16 @@ public class ChecklistRunServiceTest {
     @Autowired
     private ChecklistTemplateRepository templateRepository;
 
+    @Autowired
+    private UserRepository userRepository;
+
 
     @Test
     public void testCreateRun() {
+        User user = User.builder().username("Admin").password(
+                "...").build();
+        user = userRepository.save(user);
+
         ChecklistItemTemplate item1 = ChecklistItemTemplate.builder()
                 .description("Item 1")
                 .itemOrder(1)
@@ -53,7 +58,7 @@ public class ChecklistRunServiceTest {
 
         template = templateRepository.save(template);
 
-        ChecklistRunDTO run = runService.createRun(template.getId(), "My First Run");
+        ChecklistRunDTO run = runService.createRun(template.getId(), "My First Run",user);
 
         assertThat(run.getId()).isNotNull();
         assertThat(run.getItems()).hasSize(2);
@@ -63,6 +68,11 @@ public class ChecklistRunServiceTest {
 
     @Test
     public void testGetRun() {
+        User user = User.builder().username("Admin").password(
+                "...").build();
+
+        user = userRepository.save(user);
+
         ChecklistItemTemplate item1 = ChecklistItemTemplate.builder()
                 .description("Build passes")
                 .itemOrder(1)
@@ -73,9 +83,10 @@ public class ChecklistRunServiceTest {
                 .items(List.of(item1))
                 .build();
         item1.setTemplate(template);
+
         template = templateRepository.save(template);
 
-        ChecklistRunDTO run = runService.createRun(template.getId(), "Check release");
+        ChecklistRunDTO run = runService.createRun(template.getId(), "Check release",user);
 
         ChecklistRunDTO fetched = runService.getRun(run.getId());
 
@@ -86,6 +97,11 @@ public class ChecklistRunServiceTest {
 
     @Test
     public void testToggleItem() {
+        User user = User.builder().username("Admin").password(
+                "...").build();
+
+        user = userRepository.save(user);
+
         ChecklistItemTemplate item = ChecklistItemTemplate.builder()
                 .description("Push tag")
                 .itemOrder(1)
@@ -96,9 +112,10 @@ public class ChecklistRunServiceTest {
                 .items(List.of(item))
                 .build();
         item.setTemplate(template);
+
         template = templateRepository.save(template);
 
-        ChecklistRunDTO run = runService.createRun(template.getId(), "Deploy 1.0");
+        ChecklistRunDTO run = runService.createRun(template.getId(), "Deploy 1.0",user);
         ChecklistItemRunDTO itemRun = run.getItems().getFirst();
 
         ChecklistRunDTO updatedRun = runService.toggleItem(run.getId(), itemRun.getId());
@@ -113,13 +130,19 @@ public class ChecklistRunServiceTest {
 
     @Test
     public void testCreateRunFailsWithInvalidTemplate() {
-        assertThatThrownBy(() -> runService.createRun(999L, "Bad Run"))
+        User user = User.builder().username("Admin").password(
+                "...").build();
+        assertThatThrownBy(() -> runService.createRun(999L, "Bad Run",userRepository.save(user)))
                 .isInstanceOf(ChecklistException.class)
                 .hasMessageContaining("Template not found");
     }
 
     @Test
     public void testToggleItemFailsIfItemNotFound() {
+        User user = User.builder().username("Admin").password(
+                "...").build();
+        user = userRepository.save(user);
+
         ChecklistItemTemplate item = ChecklistItemTemplate.builder()
                 .description("Dummy")
                 .itemOrder(1)
@@ -132,11 +155,12 @@ public class ChecklistRunServiceTest {
         item.setTemplate(template);
         template = templateRepository.save(template);
 
-        ChecklistRunDTO run = runService.createRun(template.getId(), "Run");
+        ChecklistRunDTO run = runService.createRun(template.getId(), "Run",user);
 
         assertThatThrownBy(() -> runService.toggleItem(run.getId(), 999L))
                 .isInstanceOf(ChecklistException.class)
                 .hasMessageContaining("Item not found");
 
     }
+
 }

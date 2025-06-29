@@ -2,6 +2,7 @@ package org.davideviscogliosi.devchecklist.controller.handler;
 
 import org.davideviscogliosi.devchecklist.dto.ChecklistTemplateDTO;
 import org.davideviscogliosi.devchecklist.dto.OutcomeDTO;
+import org.davideviscogliosi.devchecklist.model.User;
 import org.davideviscogliosi.devchecklist.service.ChecklistTemplateService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
@@ -19,15 +20,15 @@ public class ChecklistTemplateHandler extends ResponseHandler{
         this.templateService = templateService;
     }
 
-    public ResponseEntity<OutcomeDTO<ChecklistTemplateDTO>> createTemplate(@RequestBody ChecklistTemplateDTO template) {
-        return executeWithResponse("create-template" , () -> templateService.createTemplate(template));
+    public ResponseEntity<OutcomeDTO<ChecklistTemplateDTO>> createTemplate(ChecklistTemplateDTO template, User user) {
+        return executeWithResponse("create-template" , () -> templateService.createTemplate(template,user));
     }
 
     public ResponseEntity<OutcomeDTO<List<ChecklistTemplateDTO>>> getAllTemplates() {
         return executeWithResponse("get-all-templates" , templateService::getAllTemplates);
     }
 
-    public ResponseEntity<OutcomeDTO<ChecklistTemplateDTO>> getTemplateById(@PathVariable Long id) {
+    public ResponseEntity<OutcomeDTO<ChecklistTemplateDTO>> getTemplateById(Long id) {
         return executeWithResponse("get-template-by-id" ,() -> templateService.getTemplateById(id));
 
     }

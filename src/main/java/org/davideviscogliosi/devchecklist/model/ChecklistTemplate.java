@@ -25,4 +25,8 @@ public class ChecklistTemplate {
     @OneToMany(mappedBy = "template",cascade = CascadeType.ALL,orphanRemoval = true)
     private List<ChecklistItemTemplate> items;
 
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "user_id")
+    private User owner;
+
 }

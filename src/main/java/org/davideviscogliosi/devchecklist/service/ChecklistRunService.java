@@ -10,6 +10,7 @@ import org.davideviscogliosi.devchecklist.mapper.ChecklistRunMapper;
 import org.davideviscogliosi.devchecklist.model.ChecklistItemRun;
 import org.davideviscogliosi.devchecklist.model.ChecklistRun;
 import org.davideviscogliosi.devchecklist.model.ChecklistTemplate;
+import org.davideviscogliosi.devchecklist.model.User;
 import org.davideviscogliosi.devchecklist.repository.ChecklistRunRepository;
 import org.davideviscogliosi.devchecklist.repository.ChecklistTemplateRepository;
 import org.springframework.http.HttpStatus;
@@ -27,7 +28,8 @@ public class ChecklistRunService {
     private final ChecklistTemplateRepository templateRepository;
 
     @Transactional
-    public ChecklistRunDTO createRun(Long templateId, String runName) {
+    public ChecklistRunDTO createRun(Long templateId, String runName, User user) {
+
         ChecklistTemplate template = templateRepository.findById(templateId)
                 .orElseThrow(() -> new ChecklistException("Template not found", HttpStatus.NOT_FOUND));
 
@@ -44,6 +46,7 @@ public class ChecklistRunService {
                 .template(template)
                 .items(itemRuns)
                 .createdAt(LocalDateTime.now())
+                .owner(user)
                 .build();
 
         itemRuns.forEach(itemRun -> itemRun.setRun(run));

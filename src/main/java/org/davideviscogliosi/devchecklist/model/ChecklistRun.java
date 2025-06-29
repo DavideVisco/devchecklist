@@ -28,6 +28,10 @@ public class ChecklistRun {
     private List<ChecklistItemRun> items;
 
     private LocalDateTime createdAt;
+
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "user_id")
+    private User owner;
 }
 
 
