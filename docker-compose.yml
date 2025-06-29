@@ -1,0 +1,17 @@
+services:
+  postgres:
+    image: postgres:15
+    container_name: devchecklist-postgres
+    restart: always
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: devchecklist_db
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+    volumes:
+      - devchecklist_pg_data:/var/lib/postgresql/data
+      - ./initdb:/docker-entrypoint-initdb.d
+
+volumes:
+  devchecklist_pg_data:
